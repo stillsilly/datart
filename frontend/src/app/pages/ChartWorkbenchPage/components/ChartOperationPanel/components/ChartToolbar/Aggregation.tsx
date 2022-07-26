@@ -38,8 +38,8 @@ const AggregationOperationMenu: FC<{
       content: t('aggregationSwitchTip'),
       okText: checkedValue ? t('close') : t('open'),
       onOk() {
-        onChangeAggregation();
         dispatch(actions.updateChartAggregation(value));
+        onChangeAggregation();
       },
     });
   };

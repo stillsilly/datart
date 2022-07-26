@@ -452,8 +452,12 @@ export const ChartEditor: FC<ChartEditorProps> = ({
   );
 
   const handleAggregationState = useCallback(() => {
-    clearDataConfig();
-  }, [clearDataConfig]);
+    handleChartConfigChange(ChartConfigReducerActionType.DATA, {
+      ancestors: [0],
+      value: chartConfig?.datas?.[0],
+      needRefresh: true,
+    });
+  }, [handleChartConfigChange]);
 
   const buildDataChart = useCallback(() => {
     const dataChartConfig: DataChartConfig = {
