@@ -451,13 +451,53 @@ export const ChartEditor: FC<ChartEditorProps> = ({
     [clearDataConfig],
   );
 
+  const clearAggregate = function(draft) {
+    let datas = draft?.datas || [];
+    datas.forEach(data => {
+      data?.rows?.forEach(config => {
+        if (config.aggregate) {
+          config.oldAggregate = config.aggregate;
+          delete config.aggregate;
+        }
+        if (config.aggregateLimit) {
+          config.oldAggregateLimit = config.aggregateLimit;
+          delete config.aggregateLimit;
+        }
+      });
+    });
+  };
+
+  const recoverAggregate = function(draft) {
+    let datas = draft?.datas || [];
+    datas.forEach(data => {
+      data?.rows?.forEach(config => {
+        if (config.oldAggregate) {
+          config.aggregate = config.oldAggregate;
+          delete config.oldAggregate;
+        }
+        if (config.oldAggregateLimit) {
+          config.aggregateLimit = config.oldAggregateLimit;
+          delete config.oldAggregateLimit;
+        }
+      });
+    });
+  };
+
   const handleAggregationState = useCallback(() => {
+    const newConfig = updateBy(chartConfig, draft => {
+      if (!aggregation) {
+        recoverAggregate(draft);
+      } else {
+        clearAggregate(draft);
+      }
+    });
+
     handleChartConfigChange(ChartConfigReducerActionType.DATA, {
       ancestors: [0],
-      value: chartConfig?.datas?.[0],
+      value: newConfig?.datas?.[0],
       needRefresh: true,
     });
-  }, [handleChartConfigChange]);
+  }, [chartConfig, aggregation, handleChartConfigChange]);
 
   const buildDataChart = useCallback(() => {
     const dataChartConfig: DataChartConfig = {
